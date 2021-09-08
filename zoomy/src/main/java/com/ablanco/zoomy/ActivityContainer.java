@@ -3,16 +3,11 @@ package com.ablanco.zoomy;
 import android.app.Activity;
 import android.view.ViewGroup;
 
-/**
- * Created by Álvaro Blanco Cabrero on 01/05/2017.
- * Zoomy.
- */
+public class ActivityContainer implements TargetContainer {
 
-public class ActivityContainer implements TargetContainer{
+    private final Activity mActivity;
 
-    private Activity mActivity;
-
-    ActivityContainer(Activity activity){
+    ActivityContainer(Activity activity) {
         this.mActivity = activity;
     }
 

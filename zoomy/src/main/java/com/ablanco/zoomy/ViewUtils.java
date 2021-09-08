@@ -6,20 +6,13 @@ import android.graphics.Point;
 import android.graphics.PointF;
 import android.view.View;
 
-/**
- * Created by Álvaro Blanco Cabrero on 11/02/2017.
- * Zoomy.
- */
 class ViewUtils {
 
     static Bitmap getBitmapFromView(View view) {
-        //Define a bitmap with the same size as the view
         Bitmap returnedBitmap = Bitmap.createBitmap(view.getWidth(), view.getHeight(), Bitmap.Config.ARGB_8888);
-        //Bind a canvas to it
+
         Canvas canvas = new Canvas(returnedBitmap);
-        // draw the view on the canvas
         view.draw(canvas);
-        //return the bitmap
         return returnedBitmap;
     }
 

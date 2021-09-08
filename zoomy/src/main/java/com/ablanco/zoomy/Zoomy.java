@@ -6,11 +6,6 @@ import android.app.DialogFragment;
 import android.view.View;
 import android.view.animation.Interpolator;
 
-/**
- * Created by Álvaro Blanco Cabrero on 12/02/2017.
- * Zoomy.
- */
-
 public class Zoomy {
 
     private static ZoomyConfig mDefaultConfig = new ZoomyConfig();
@@ -31,7 +26,7 @@ public class Zoomy {
         private boolean mDisposed = false;
 
         private ZoomyConfig mConfig;
-        private TargetContainer mTargetContainer;
+        private final TargetContainer mTargetContainer;
         private View mTargetView;
         private ZoomListener mZoomListener;
         private Interpolator mZoomInterpolator;
@@ -104,8 +99,6 @@ public class Zoomy {
         public void register() {
             checkNotDisposed();
             if (mConfig == null) mConfig = mDefaultConfig;
-            if (mTargetContainer == null)
-                throw new IllegalArgumentException("Target container must not be null");
             if (mTargetView == null)
                 throw new IllegalArgumentException("Target view must not be null");
             mTargetView.setOnTouchListener(new ZoomableTouchListener(mTargetContainer, mTargetView,
@@ -117,6 +110,5 @@ public class Zoomy {
         private void checkNotDisposed() {
             if (mDisposed) throw new IllegalStateException("Builder already disposed");
         }
-
     }
 }
