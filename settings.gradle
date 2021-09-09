@@ -1,1 +1,3 @@
-include ':app', ':zoomy'
+rootProject.name = "Zoomy"
+include ':app'
+include ':zoomy'
