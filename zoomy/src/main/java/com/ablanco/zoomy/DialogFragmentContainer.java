@@ -1,10 +1,12 @@
 package com.ablanco.zoomy;
 
-import android.app.DialogFragment;
+import androidx.fragment.app.DialogFragment;
+
+import androidx.annotation.NonNull;
 
 public class DialogFragmentContainer extends DialogContainer {
 
-    DialogFragmentContainer(DialogFragment dialog) {
-        super(dialog.getDialog());
+    DialogFragmentContainer(@NonNull DialogFragment dialog) {
+        super(dialog.requireDialog());
     }
 }

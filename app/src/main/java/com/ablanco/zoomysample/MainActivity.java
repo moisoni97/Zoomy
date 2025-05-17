@@ -63,6 +63,8 @@ public class MainActivity extends AppCompatActivity {
             holder.itemView.setTag(holder.getBindingAdapterPosition());
             Zoomy.Builder builder = new Zoomy.Builder(MainActivity.this)
                     .target(holder.itemView)
+                    .enableImmersiveMode(true)
+                    .enableShadow(true)
                     .interpolator(new OvershootInterpolator())
                     .tapListener(v -> Toast.makeText(MainActivity.this, "Tap on: "
                             + v.getTag(), Toast.LENGTH_SHORT).show())
@@ -79,13 +81,13 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private static class ImageViewHolder extends RecyclerView.ViewHolder {
+    public static class ImageViewHolder extends RecyclerView.ViewHolder {
         ImageViewHolder(View itemView) {
             super(itemView);
         }
     }
 
-    public static class CommonItemSpaceDecoration extends RecyclerView.ItemDecoration {
+    private static class CommonItemSpaceDecoration extends RecyclerView.ItemDecoration {
         private final int mSpace;
 
         CommonItemSpaceDecoration(int space) {
@@ -93,7 +95,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         @Override
-        public void getItemOffsets(Rect outRect, @NonNull View view, @NonNull RecyclerView parent, @NonNull RecyclerView.State state) {
+        public void getItemOffsets(@NonNull Rect outRect, @NonNull View view, @NonNull RecyclerView parent, @NonNull RecyclerView.State state) {
             outRect.set(mSpace, mSpace, mSpace, mSpace);
         }
     }

@@ -1,5 +1,6 @@
 package com.ablanco.zoomy;
 
+import android.content.res.TypedArray;
 import android.graphics.Color;
 import android.graphics.Point;
 import android.graphics.PointF;
@@ -9,11 +10,19 @@ import android.view.ScaleGestureDetector;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
+import android.view.Window;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.Interpolator;
 import android.widget.ImageView;
 
+import androidx.annotation.NonNull;
+import androidx.core.view.WindowCompat;
+import androidx.core.view.WindowInsetsCompat;
+import androidx.core.view.WindowInsetsControllerCompat;
+
 class ZoomableTouchListener implements View.OnTouchListener, ScaleGestureDetector.OnScaleGestureListener {
+
+    private final Window window;
 
     private static final int STATE_IDLE = 0;
     private static final int STATE_POINTER_DOWN = 1;
@@ -42,7 +51,9 @@ class ZoomableTouchListener implements View.OnTouchListener, ScaleGestureDetecto
     private final Runnable mEndingZoomAction = new Runnable() {
         @Override
         public void run() {
-            removeFromDecorView(mShadow);
+            if (mConfig.isShadowEnabled()) {
+                removeFromDecorView(mShadow);
+            }
             removeFromDecorView(mZoomableView);
             mTarget.setVisibility(View.VISIBLE);
             mZoomableView = null;
@@ -57,18 +68,19 @@ class ZoomableTouchListener implements View.OnTouchListener, ScaleGestureDetecto
         }
     };
 
-
     ZoomableTouchListener(TargetContainer targetContainer,
-                          View view,
+                          @NonNull View view,
                           ZoomyConfig config,
                           Interpolator interpolator,
                           ZoomListener zoomListener,
                           TapListener tapListener,
                           LongPressListener longPressListener,
-                          DoubleTapListener doubleTapListener) {
+                          DoubleTapListener doubleTapListener,
+                          Window window) {
         this.mTargetContainer = targetContainer;
         this.mTarget = view;
         this.mConfig = config;
+        this.window = window;
         this.mEndZoomingInterpolator = interpolator != null
                 ? interpolator : new AccelerateDecelerateInterpolator();
         this.mScaleGestureDetector = new ScaleGestureDetector(view.getContext(), this);
@@ -102,9 +114,8 @@ class ZoomableTouchListener implements View.OnTouchListener, ScaleGestureDetecto
     public boolean onTouch(View v, MotionEvent ev) {
 
         if (mAnimatingZoomEnding || ev.getPointerCount() > 2) {
-            if (ev.getPointerCount() > 2) {
-                mEndingZoomAction.run();
-            }
+            mEndingZoomAction.run();
+
             return true;
         }
 
@@ -188,10 +199,12 @@ class ZoomableTouchListener implements View.OnTouchListener, ScaleGestureDetecto
         mZoomableView.setX(mTargetViewCords.x);
         mZoomableView.setY(mTargetViewCords.y);
 
-        if (mShadow == null) mShadow = new View(mTarget.getContext());
-        mShadow.setBackgroundResource(0);
+        if (mConfig.isShadowEnabled()) {
+            if (mShadow == null) mShadow = new View(mTarget.getContext());
+            mShadow.setBackgroundResource(0);
+            addToDecorView(mShadow);
+        }
 
-        addToDecorView(mShadow);
         addToDecorView(mZoomableView);
 
         disableParentTouch(mTarget.getParent());
@@ -211,7 +224,9 @@ class ZoomableTouchListener implements View.OnTouchListener, ScaleGestureDetecto
 
         mZoomableView.setScaleX(mScaleFactor);
         mZoomableView.setScaleY(mScaleFactor);
-        obscureDecorView(mScaleFactor);
+        if (mConfig.isShadowEnabled()) {
+            obscureDecorView(mScaleFactor);
+        }
         return true;
     }
 
@@ -241,16 +256,41 @@ class ZoomableTouchListener implements View.OnTouchListener, ScaleGestureDetecto
     }
 
     private void hideSystemUI() {
-        mTargetContainer.getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-                | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-                | View.SYSTEM_UI_FLAG_FULLSCREEN);
+        if (window == null) return;
+        WindowInsetsControllerCompat controller = WindowCompat.getInsetsController(window, window.getDecorView());
+        controller.hide(WindowInsetsCompat.Type.systemBars());
+        controller.setSystemBarsBehavior(
+                WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE);
     }
 
     private void showSystemUI() {
-        mTargetContainer.getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_VISIBLE);
+        if (window == null) return;
+        WindowInsetsControllerCompat controller = WindowCompat.getInsetsController(window, window.getDecorView());
+        controller.show(WindowInsetsCompat.Type.navigationBars());
+
+        boolean isFullscreen = isInFullscreenMode(window);
+        if (isFullscreen) {
+            controller.hide(WindowInsetsCompat.Type.statusBars());
+        } else {
+            controller.show(WindowInsetsCompat.Type.statusBars());
+        }
+
+        controller.setSystemBarsBehavior(
+                WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE);
     }
 
-    private void disableParentTouch(ViewParent view) {
+    private boolean isInFullscreenMode(@NonNull Window window) {
+        return isFullScreenTheme(window);
+    }
+
+    private boolean isFullScreenTheme(@NonNull Window window) {
+        try (TypedArray a = window.getContext().obtainStyledAttributes(
+                new int[]{android.R.attr.windowFullscreen})) {
+            return a.getBoolean(0, false);
+        }
+    }
+
+    private void disableParentTouch(@NonNull ViewParent view) {
         view.requestDisallowInterceptTouchEvent(true);
         if (view.getParent() != null) disableParentTouch((view.getParent()));
     }

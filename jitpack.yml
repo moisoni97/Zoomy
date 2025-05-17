@@ -1,5 +1,2 @@
 jdk:
- - openjdk11
-install:
- - ./gradlew :zoomy:build :zoomy:publishToMavenLocal -x :zoomy:test
- - find . -name "*.aar"
+  - openjdk17

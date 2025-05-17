@@ -2,8 +2,12 @@ package com.ablanco.zoomy;
 
 import android.app.Activity;
 import android.app.Dialog;
-import android.app.DialogFragment;
+
+import androidx.annotation.NonNull;
+import androidx.fragment.app.DialogFragment;
+
 import android.view.View;
+import android.view.Window;
 import android.view.animation.Interpolator;
 
 public class Zoomy {
@@ -17,7 +21,7 @@ public class Zoomy {
         mDefaultConfig = config;
     }
 
-    public static void unregister(View view) {
+    public static void unregister(@NonNull View view) {
         view.setOnTouchListener(null);
     }
 
@@ -33,17 +37,22 @@ public class Zoomy {
         private TapListener mTapListener;
         private LongPressListener mLongPressListener;
         private DoubleTapListener mdDoubleTapListener;
+        private final Window mWindow;
 
         public Builder(Activity activity) {
             this.mTargetContainer = new ActivityContainer(activity);
+            this.mWindow = activity.getWindow();
         }
 
         public Builder(Dialog dialog) {
             this.mTargetContainer = new DialogContainer(dialog);
+            this.mWindow = dialog.getWindow();
         }
 
         public Builder(DialogFragment dialogFragment) {
             this.mTargetContainer = new DialogFragmentContainer(dialogFragment);
+            Dialog dialog = dialogFragment.requireDialog();
+            this.mWindow = dialog.getWindow();
         }
 
         public Builder target(View target) {
@@ -62,6 +71,13 @@ public class Zoomy {
             checkNotDisposed();
             if (mConfig == null) mConfig = new ZoomyConfig();
             this.mConfig.setImmersiveModeEnabled(enable);
+            return this;
+        }
+
+        public Builder enableShadow(boolean enable) {
+            checkNotDisposed();
+            if (mConfig == null) mConfig = new ZoomyConfig();
+            this.mConfig.setShadowEnabled(enable);
             return this;
         }
 
@@ -103,7 +119,7 @@ public class Zoomy {
                 throw new IllegalArgumentException("Target view must not be null");
             mTargetView.setOnTouchListener(new ZoomableTouchListener(mTargetContainer, mTargetView,
                     mConfig, mZoomInterpolator, mZoomListener, mTapListener, mLongPressListener,
-                    mdDoubleTapListener));
+                    mdDoubleTapListener, mWindow));
             mDisposed = true;
         }
 
