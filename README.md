@@ -6,7 +6,7 @@ Zoomy is an easy to use pinch-to-zoom library for Android.
 
 # Getting Started
 
-* You project should build against Android 4.1.x (minSdkVersion 16).
+* You project should build against Android 6.0 (minSdk 23).
 
 * Add the JitPack repository to your project's build.gradle file:
 
@@ -23,7 +23,7 @@ allprojects {
 
 ```gradle
 dependencies {
-    implementation 'com.github.moisoni97:Zoomy:2.0.0'
+    implementation 'com.github.moisoni97:Zoomy:3.0.0'
 }
 ```
 
@@ -62,7 +62,8 @@ Zoomy.setDefaultConfig(config); //set the configuration across all `Zoomy` regis
 ```java
 Zoomy.Builder builder = new Zoomy.Builder(this)
                     .target(imageView)
-                    .enableImmersiveMode(false)
+                    .enableImmersiveMode(true)
+                    .enableShadow(true)
                     .animateZooming(false);
 ```
 
