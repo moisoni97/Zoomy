@@ -1,4 +1,4 @@
-# Zoomy Library
+# Zoomy Library [![API](https://img.shields.io/badge/API-23%2B-brightgreen.svg?style=flat)](https://android-arsenal.com/api?level=23) [![JitPack](https://jitpack.io/v/moisoni97/Zoomy.svg)](https://jitpack.io/#moisoni97/Zoomy)
 Zoomy is an easy to use pinch-to-zoom library for Android.
 
 ![alt tag](art/zoomy-sample.gif)
